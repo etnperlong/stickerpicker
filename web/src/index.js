@@ -22,12 +22,20 @@ import * as frequent from "./frequently-used.js"
 
 // The base URL for fetching packs. The app will first fetch ${PACK_BASE_URL}/index.json,
 // then ${PACK_BASE_URL}/${packFile} for each packFile in the packs object of the index.json file.
-const PACKS_BASE_URL = "packs"
+const params = new URLSearchParams(document.location.search);
+const id = params.get("id");
+const baseUrl = window.location.origin;
 
-let INDEX = `${PACKS_BASE_URL}/index.json`
-const params = new URLSearchParams(document.location.search)
-if (params.has('config')) {
-	INDEX = params.get("config")
+let PACKS_BASE_URL;
+let INDEX;
+
+if (id) {
+	PACKS_BASE_URL = `${baseUrl}/api/public/widget/${id}`;
+	INDEX = `${PACKS_BASE_URL}/index.json`;
+} else {
+	// Fallback to original behavior if id is not present
+	PACKS_BASE_URL = "packs";
+	INDEX = `${PACKS_BASE_URL}/index.json`;
 }
 
 const makeThumbnailURL = mxc => `${PACKS_BASE_URL}/thumbnails/${mxc.split("/").slice(-1)[0]}`
