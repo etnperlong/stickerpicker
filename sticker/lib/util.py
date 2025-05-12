@@ -17,8 +17,6 @@ from functools import partial
 from io import BytesIO
 import os.path
 import json
-from pathlib import Path
-from typing import Dict, List
 
 from PIL import Image
 
@@ -26,19 +24,19 @@ from . import matrix
 
 open_utf8 = partial(open, encoding='UTF-8')
 
-def convert_image(data: bytes, max_w=256, max_h=256) -> (bytes, int, int):
+def convert_image(data: bytes) -> (bytes, int, int):
     image: Image.Image = Image.open(BytesIO(data)).convert("RGBA")
     new_file = BytesIO()
     image.save(new_file, "png")
     w, h = image.size
-    if w > max_w or h > max_h:
+    if w > 256 or h > 256:
         # Set the width and height to lower values so clients wouldn't show them as huge images
         if w > h:
-            h = int(h / (w / max_w))
-            w = max_w
+            h = int(h / (w / 256))
+            w = 256
         else:
-            w = int(w / (h / max_h))
-            h = max_h
+            w = int(w / (h / 256))
+            h = 256
     return new_file.getvalue(), w, h
 
 
@@ -80,15 +78,3 @@ def make_sticker(mxc: str, width: int, height: int, size: int,
         },
         "msgtype": "m.sticker",
     }
-
-
-def add_thumbnails(stickers: List[matrix.StickerInfo], stickers_data: Dict[str, bytes], output_dir: str) -> None:
-    thumbnails = Path(output_dir, "thumbnails")
-    thumbnails.mkdir(parents=True, exist_ok=True)
-
-    for sticker in stickers:       
-        image_data, _, _ = convert_image(stickers_data[sticker["url"]], 128, 128)
-        
-        name = sticker["url"].split("/")[-1]
-        thumbnail_path = thumbnails / name
-        thumbnail_path.write_bytes(image_data)
