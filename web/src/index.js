@@ -24,6 +24,7 @@ import * as frequent from "./frequently-used.js"
 // then ${PACK_BASE_URL}/${packFile} for each packFile in the packs object of the index.json file.
 const params = new URLSearchParams(document.location.search);
 const id = params.get("id");
+const access_token = params.get("access_token")
 const baseUrl = window.location.origin;
 
 let PACKS_BASE_URL;
@@ -40,7 +41,7 @@ if (id) {
 // This is updated from packs/index.json
 let HOMESERVER_URL = "https://matrix-client.matrix.org"
 
-const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/v3/thumbnail/${mxc.slice(6)}?height=128&width=128&method=scale`
+const makeThumbnailURL = mxc => `${HOMESERVER_URL}/_matrix/media/v3/thumbnail/${mxc.slice(6)}?height=128&width=128&method=scale&access_token=${access_token}`
 
 // We need to detect iOS webkit because it has a bug related to scrolling non-fixed divs
 // This is also used to fix scrolling to sections on Element iOS
